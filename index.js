@@ -1,60 +1,54 @@
+// Importing required modules and packages
 const express = require('express')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const cors = require('cors')
-var { graphqlHTTP }  = require('express-graphql');
 
-//Import schema and resolvers
-const empTypeDef = require('./Schema/employee')
-const empRes = require('./Resolvers/empRes')
+// Import schema and resolvers
+const TypeDef = require('./Schema/schema')
+const Resolver = require('./Resolvers/resolver')
 
-//import ApolloServer
+// Import Apollo Server
 const { ApolloServer } = require('apollo-server-express')
 
-//Store MongoDB key and port
+// Store MongoDB key and port in .env file
 const dotenv = require('dotenv');
 dotenv.config();
 
-//mongoDB Atlas Connection String
+// MongoDB Atlas Connection String
 const mongodb_atlas_url = process.env.MONGODB_URL;
 
-//Connect to MongoDB
+// Connect to MongoDB
 mongoose.connect(mongodb_atlas_url, {
     useNewUrlParser: true,
     useUnifiedTopology: true
-  }).then(success => {
+}).then(success => {
     console.log('Success Mongodb connection')
-  }).catch(err => {
+}).catch(err => {
     console.log('Error Mongodb connection')
-  });
+});
 
-//Define Apollo Server
+// Define Apollo Server
 const server = new ApolloServer({
-    typeDefs: empTypeDef.employeeTypeDef,
-    resolvers: empRes.empResolver,
+    typeDefs: TypeDef.typeDef,
+    resolvers: Resolver.resolver,
+
+    // Added a formatting so stacktrace is hidden in error message
     formatError: (error) => {
         const message = error.message;
         return { message };
-      },
-  })
-  
-// // Start the Apollo Server
-// async function startServer() {
-//     await server.start();
-//   }
-  
-//   startServer();
+    },
+})
 
-//Define Express Server
+// Define Express Server
 const app = express();
 app.use(bodyParser.json());
 app.use('*', cors());
 
-//Add Express app as middleware to Apollo Server
-server.applyMiddleware({app})
+// Express as middleware to our Apollo Server
+server.applyMiddleware({ app })
 
-//console.log(server)
 
-//Start listen 
+//Listen to designated port
 app.listen({ port: process.env.PORT }, () =>
-console.log(`🚀 Server ready at http://localhost:${process.env.PORT}${server.graphqlPath}`));
+console.log(`Server ready at http://localhost:${process.env.PORT}${server.graphqlPath}`));

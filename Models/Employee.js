@@ -1,7 +1,10 @@
+// Import mongoose package
 const mongoose = require('mongoose')
 
+//Email Regex validator
 const validEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
+// Creates a schema in mongoDB
 const EmployeeSchema = new mongoose.Schema({
     first_name: {
         type: String,
