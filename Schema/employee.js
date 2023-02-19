@@ -21,7 +21,7 @@ exports.employeeTypeDef = gql `
     type Query {
         userLogin(username: String!, password: String!): String!
         getEmployees: [Employee]
-        getEmployeeByID(id: ID!): Employee
+        searchEmployeeID(id: ID!): Employee
     }
 
     type Mutation{

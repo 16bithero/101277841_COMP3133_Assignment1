@@ -6,7 +6,7 @@ exports.empResolver = {
         getEmployees: async (parent, args) => {
             return Employee.find({})
         },
-        getEmployeeByID: async (parent, args) => {
+        searchEmployeeID: async (parent, args) => {
             return Employee.findById(args.id)
         },
         userLogin: async (parent, args) => {
@@ -23,7 +23,8 @@ exports.empResolver = {
                         throw new Error('Invalid password')
                     }
                 })
-                return 'Success'
+                const message = "Login succesfull."
+                return message
 
                 
           }
@@ -80,34 +81,29 @@ exports.empResolver = {
             }
         },
 
-
-
         updateEmployee: async (parent, args) => {
             if (!args.id) {
-                return;
-            }
-
-            return await Employee.findOneAndUpdate(
-                {
-                    _id: args.id
-                },
-                {
-                    $set: {
-                        first_name: args.first_name,
-                        last_name: args.last_name,
-                        email: args.email,
-                        gender: args.gender,
-                        salary: args.salary
-                    }
-                }, { new: true }, (err, employee) => {
-                    if (err) {
-                        console.log('Update failed. Please check input and try again.');
-                    } else {
-                        return employee
-                    }
-                }
-            );
+                return null;
+              }
+              try {
+                const employee = await Employee.findOneAndUpdate(
+                  { _id: args.id },
+                  { $set: args },
+                  { new: true }
+                );
+                return employee;
+              } catch (err) {
+                throw new Error('No user found')
+              }
         },
+
+
+
+
+
+        
+
+
         deleteEmployee: async (parent, args) => {
             console.log(args)
             if (!args.id) {
