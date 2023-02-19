@@ -10,40 +10,78 @@ exports.empResolver = {
             return Employee.findById(args.id)
         },
         userLogin: async (parent, args) => {
-            return Users.find({})
-        }
+          
+            // Perform a query to find a user with the provided username and password
+            const user = Users.findOne({ username: args.username, password: args.password });
+      
+            // If a user was found, return a successful authentication result
+            if (user) {
+              return {
+                token: 'myauthtoken',
+                user: {
+                  id: user._id.toString(),
+                  username: user.username,
+                  email: user.email,
+                  // Other user fields
+                },
+              };
+            } else {
+              // If a user was not found, return an unsuccessful authentication result
+              return null;
+            }
+          },
     },
 
     Mutation: {
         addEmployee: async (parent, args) => {
-            try {
-              const newEmp = new Employee({
+            let newEmp = new Employee({
                 first_name: args.first_name,
                 last_name: args.last_name,
                 email: args.email,
                 gender: args.gender,
                 salary: args.salary,
-              })
-      
-              const error = newEmp.validateSync();
-              if (error && error.errors && error.errors.email) {
-                throw new Error('Invalid email. Please check the entry and try again.');
-              }
-              
-              return newEmp.save()
-            } catch (err) {
-              throw err
+            })
+            try {
+                const result = await newEmp.save()
+                return result
+            } catch (error) {
+                if (error.code === 11000) {
+                    throw new Error('Email already exists. Please use a different email.')
+                } else if (error && error.errors && error.errors.email) {
+                    throw new Error('Invalid email. Please check the entry and try again.');
+                }
+
+                else {
+                    throw error
+                }
             }
-          },
-      
+
+        },
+
         addUser: async (parent, args) => {
             let newUser = new Users({
                 username: args.username,
                 email: args.email,
                 password: args.password
             })
-            return newUser.save()
+
+            try {
+                const result = await newUser.save()
+                return result
+            } catch (error) {
+                if (error.code === 11000) {
+                    throw new Error('Email already exists. Please use a different email.')
+                } else if (error && error.errors && error.errors.email) {
+                    throw new Error('Invalid email. Please check the entry and try again.');
+                }
+
+                else {
+                    throw error
+                }
+            }
         },
+
+
 
         updateEmployee: async (parent, args) => {
             if (!args.id) {

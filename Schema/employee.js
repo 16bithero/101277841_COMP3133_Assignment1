@@ -17,8 +17,9 @@ exports.employeeTypeDef = gql `
         password: String!
     }
 
+
     type Query {
-        userLogin: [Users]
+        userLogin(username: String!, password: String!): String!
         getEmployees: [Employee]
         getEmployeeByID(id: ID!): Employee
     }
