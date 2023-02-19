@@ -10,26 +10,25 @@ exports.empResolver = {
             return Employee.findById(args.id)
         },
         userLogin: async (parent, args) => {
+
+              const username = args.username
+              const password = args.password
+              const user = await Users.findOne({username})
+            
+                if(!user) {
+                    throw new Error('No user found')
+                }
+                !user.comparePassword(password, (error, match) => {
+                    if(!match){
+                        throw new Error('Invalid password')
+                    }
+                })
+                return 'Success'
+
+                
+          }
+
           
-            // Perform a query to find a user with the provided username and password
-            const user = Users.findOne({ username: args.username, password: args.password });
-      
-            // If a user was found, return a successful authentication result
-            if (user) {
-              return {
-                token: 'myauthtoken',
-                user: {
-                  id: user._id.toString(),
-                  username: user.username,
-                  email: user.email,
-                  // Other user fields
-                },
-              };
-            } else {
-              // If a user was not found, return an unsuccessful authentication result
-              return null;
-            }
-          },
     },
 
     Mutation: {
